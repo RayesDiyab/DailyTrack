@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Daily Track</title>
+    <link rel="icon" type="image/png" href="/favicon-16x16.png">
+</head>
+
+<body>
+
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://momentjs.com/downloads/moment.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <style>
+            th {
+                color: #fff;
+            }
+        </style>
+        <br /><br />
+        <h1 style="text-align: center;"><span style="color: #3299CC; background-color: #ffffff;"><strong>Daily Track</strong></span></h1>
+
+
+        <div class="container" style="width:900px;">
+            <h4 style="text-align: center;"><span style="color: #000000; background-color: #ffffff;">by Rayes Diyab and Erdem Koca</span></h4>
+            <br /><br />
+
+            <div id="piechart" style="width: 900px; height: 500px;"></div>
+            <br /><br />
+            <div id="chart_div"></div>
+            <br /><br />
+            <br /><br />
+            <div id="donutchart" style="width: 900px; height: 500px;"></div>
+            <div id="scatter_chart" style="width: 900px; height: 500px;"></div>
+            <br /><br />
+            <br /><br />
+
+
+            <div align="center">
+                <input type="text" id="myInput" placeholder="Search Tracked Processes" class="form-control" />
+            </div>
+            <br />
+        </div>
+
+
+        <table class="table table-striped">
+            <tr class="bg-info">
+                <th>Process Name</th>
+                <th>Total Time Open <br />(minutes)<br /> </th>
+                <th>Usages</th>
+                <th>Last Opened <br />(h/min/sec)<br /></th>
+                <th>Last Closed <br />(h/min/sec)<br /></th>
+                <th>Date <br />(Day-Month-Year)<br /></th>
+            </tr>
+
+            <tbody id="myTable">
+
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+            $.ajax({
+                type: "GET",
+                url: "Activity.json",
+                success: function (response) {
+                    console.log(response);
+
+                    google.charts.load('current', { 'packages': ['corechart'] });
+                    google.charts.setOnLoadCallback(drawChart);
+                    google.charts.setOnLoadCallback(drawPieChart);
+                    google.charts.setOnLoadCallback(drawBasic);
+                    google.charts.setOnLoadCallback(drawScatter);
+
+
+                    function drawChart() {
+                        var currentDay = moment().format("DD-MM-YYYY");
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'Process');
+                        data.addColumn('number', 'Time');
+                        var hasTrackedToday = new Boolean(false);
+
+                        for (var i = 0; i < response.activities.length; i++) {
+                            var length = response.activities[i].time.length;
+                            for (var j = 0; j < length; j++) {
+                                var Date = response.activities[i].time[j].date;
+                                if (Date == currentDay) {
+                                    var totalTime = (parseInt(response.activities[i].time[j].seconds) / 60) + (parseInt(response.activities[i].time[j].minutes)) + (parseInt(response.activities[i].time[j].hours) * 60);
+                                    data.addRows([
+                                        [response.activities[i].name, totalTime]
+                                    ]);
+                                    hasTrackedToday = true;
+                                }
+                            }
+                        }
+                        if (hasTrackedToday == false) {
+                            data.addRows([
+                                ["No Activity Today", 100]
+                            ]);
+                        }
+
+                        var options = {
+                            title: 'Daily Time (minutes)',
+                        };
+
+                        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+                        chart.draw(data, options);
+                    }
+
+
+                    function drawBasic() {
+
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'Processes');
+                        data.addColumn('number', 'Usages');
+
+                        for (var i = 0; i < response.activities.length; i++) {
+                            data.addRows([
+                                [response.activities[i].name, parseInt(response.activities[i].no_of_open)],
+                            ]);
+                        }
+
+                        var options = {
+                            title: 'Usage Chart (Clicks)',
+                            width: 800,
+                            legend: { position: 'none' },
+                            chart: {
+                                title: 'Chess opening moves',
+                                subtitle: 'popularity by percentage'
+                            },
+                            axes: {
+                                x: {
+                                    0: { side: 'top', label: 'White to move' } // Top x-axis.
+                                }
+                            },
+                            bar: { groupWidth: "80%" }
+                        };
+
+                        var chart = new google.visualization.ColumnChart(
+                            document.getElementById('chart_div'));
+
+                        chart.draw(data, options);
+                    }
+
+
+                    function drawPieChart() {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'Process');
+                        data.addColumn('number', 'Minutes Total');
+
+                        for (var i = 0; i < response.activities.length; i++) {
+                            var sumTime = 0;
+                            for (var j = 0; j < response.activities[i].time.length; j++) {
+                                var totalTime = (parseInt(response.activities[i].time[j].seconds) / 60) + (parseInt(response.activities[i].time[j].minutes)) + (parseInt(response.activities[i].time[j].hours) * 60);
+                                sumTime += totalTime;
+                            }
+                            data.addRows([
+                                [response.activities[i].name, sumTime],
+                            ]);
+
+                            var options = {
+                                title: 'Total Activity (minutes)',
+                                pieHole: 0.4,
+                            };
+
+                            var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+                            chart.draw(data, options);
+                        }
+                    }
+
+                    function drawScatter() {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'Process');
+                        data.addColumn('number', 'Usagetime');
+
+                        for (var i = 0; i < response.activities.length; i++) {
+                            var sumTime = 0;
+                            for (var j = 0; j < response.activities[i].time.length; j++) {
+                                var totalTime = (parseInt(response.activities[i].time[j].seconds) / 60) + (parseInt(response.activities[i].time[j].minutes)) + (parseInt(response.activities[i].time[j].hours) * 60);
+                                sumTime += totalTime;
+                            }
+                            data.addRows([
+                                [response.activities[i].name, (sumTime / response.activities[i].no_of_open)],
+                            ]);
+                        }
+
+
+
+                        var options = {
+                            title: 'Average usage time per session (mins)',
+                            vAxis: { title: 'Session duration (min) ', minValue: 0, maxValue: response.activities.length.toFixed(2) },
+                            hAxis: { title: 'Processes', minValue: 0, maxValue: 15 },
+                            legend: 'none'
+                        };
+
+                        var chart = new google.visualization.ScatterChart(document.getElementById('scatter_chart'));
+
+                        chart.draw(data, options);
+                    }
+
+
+
+
+                    $('#myInput').on('keyup', function () {
+                        var value = $(this).val()
+                        console.log('Value: ', value)
+                        var data = searchTable(value, response)
+                        console.log("Data = ")
+                        console.log(data)
+                        buildTable(data, 1)
+                    })
+
+                    buildTable(response, 0)
+
+
+
+                    function searchTable(value, data) {
+                        var filteredData = []
+
+                        for (var i = 0; i < data.activities.length; i++) {
+                            value = value.toLowerCase()
+                            var name = data.activities[i].name.toLowerCase()
+
+                            if (name.includes(value)) {
+                                filteredData.push(data.activities[i])
+                            }
+                        }
+                        return filteredData
+                    }
+
+                    function buildTable(data, searched) {
+                        var table = document.getElementById('myTable')
+                        if (parseInt(searched) == 0) {
+                            for (var i = 0; i < data.activities.length; i++) {
+                                var length = response.activities[i].time.length;
+                                for (var j = 0; j < length; j++) {
+                                    var totalTime = (parseInt(data.activities[i].time[j].seconds) / 60) + (parseInt(data.activities[i].time[j].minutes)) + (parseInt(data.activities[i].time[j].hours) * 60);
+                                    var row = `<tr>
+                        <td>${data.activities[i].name}</td>
+                        <td>${totalTime.toFixed(2)}</td>
+                        <td>${data.activities[i].no_of_open}</td>
+                        <td>${data.activities[i].time[j].start_time}</td>
+                        <td>${data.activities[i].time[j].end_time}</td>
+                        <td>${data.activities[i].time[j].date}</td>
+                  </tr>`
+                                    table.innerHTML += row
+                                }
+                            }
+                        } else {
+                            $("#myTable tr").remove();
+                            for (var i = 0; i < data.length; i++) {
+                                var length = response.activities[i].time.length;
+                                for (var j = 0; j < length; j++) {
+                                    var totalTime = (parseInt(data[i].time[j].seconds) / 60) + (parseInt(data[i].time[j].minutes)) + (parseInt(data[i].time[j].hours) * 60);
+                                    var row = `<tr>
+                        <td>${data[i].name}</td>
+                        <td>${totalTime.toFixed(2)}</td>
+                        <td>${data[i].no_of_open}</td>
+                        <td>${data[i].time[j].start_time}</td>
+                        <td>${data[i].time[j].end_time}</td>
+                        <td>${data[i].time[j].date}</td>
+                  </tr>`
+                                    table.innerHTML += row
+                                }
+                            }
+                        }
+
+                    }
+                }
+            })
+        </script>
+
+    <body>
+        <div></div>
+    </body>
+    </head>
+
+</html>
