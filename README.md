@@ -1,4 +1,6 @@
 # DailyTrack
+![DailyTrack](https://github.com/RayesDiyab/DailyTrack/assets/114070898/265f04a7-4122-42e3-b635-0f6512bf6ce9)
+
 
 A Linux Tracker, that tracks your usage based on time spent in a program, clicked on the window, etc...
 
