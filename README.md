@@ -2,7 +2,14 @@
 
 A Tracker, that tracks your usage based on time spent in a program, clicked on the window, etc...
 
---------------------   PREREQUISITES  -----------------
+
+
+
+
+
+
+
+----------------------------------------------   PREREQUISITES  ----------------------------------------
 
 					Install Python3 if not installed via:
 
@@ -12,33 +19,30 @@ A Tracker, that tracks your usage based on time spent in a program, clicked on t
 					sudo apt-get install python3.8
 
 
----------------------   TO RUN THE TRACKER   ------------
+----------------------------------------------TO RUN THE TRACKER----------------------------------------
 
-Open the folder you found our ReadMe in (Program root 
-folder) and run the following command in Terminal:
+Open the folder you found our ReadMe in (Program root folder) and run the following command in Terminal:
 								
 						./StartTracking.sh
 
 
------------------------ LAUNCH DAILY TRACK ---------------
+---------------------------------------------- LAUNCH DAILY TRACK --------------------------------------
 
-Open the folder you found our ReadMe in (Program root 
-folder) and run the following command in Terminal:
+Open the folder you found our ReadMe in (Program root folder) and run the following command in Terminal:
 
 						./DailyTrack.sh
 							
-		and follow the onscreen instructions
+					and follow the onscreen instructions
 
 
 
-------------------------  LAUNCH BOTH  --------------------
+------------------------------------------------- LAUNCH BOTH  -----------------------------------------
 
-Open the folder you found our ReadMe in (Program root 
-folder) and run the following command in Terminal:
+Open the folder you found our ReadMe in (Program root folder) and run the following command in Terminal:
 
 					./DailyTrackWatch.sh
 							
-	 and follow the onscreen instructions
+				and follow the onscreen instructions
 
 
 
