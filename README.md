@@ -1,6 +1,6 @@
 # DailyTrack
 
-A Tracker, that tracks your usage based on time spent in a program, clicked on the window, etc...
+A Linux Tracker, that tracks your usage based on time spent in a program, clicked on the window, etc...
 
 
 
